@@ -149,27 +149,38 @@ def parse(t: str) -> Expression:
 def is_valid_expression(input_string):
     try:
         # Use ast.parse to parse the input string
+        if not input_string or input_string == " ":
+            return False
         ast.parse(input_string)
         return True
     except SyntaxError:
         return False
+    
+def main(s):
+    # test expression
+    # s = "16/4+4*3-3+1"
+    is_valid = is_valid_expression(s)
+
+    # if not true end execution
+    if not is_valid:
+        return "Invalid Input"
+
+    result = {}
+    # else continue execution 
+    e = parse(s)
+    cmp_v = ComputeVisitor()
+    e.accept(cmp_v)
+    print("Result =",cmp_v.result_)
+    result['result'] = cmp_v.result_
+
+    pp_v = PrettyPrintVisitor()
+    e.accept(pp_v)
+    print("PrettyPrint ->", pp_v.result_)
+    result['pretty_print'] = pp_v.result_
+
+    return result
 
 
+if __name__ == "__main__":
+    main()
 
-# test expression
-s = "16/4+4*3-3+1"
-result = is_valid_expression(s)
-
-# if not true end execution
-if not result:
-    exit()
-
-# else continue execution 
-e = parse(s)
-cmp_v = ComputeVisitor()
-e.accept(cmp_v)
-print("Result =",cmp_v.result_)
-
-pp_v = PrettyPrintVisitor()
-e.accept(pp_v)
-print("PrettyPrint ->", pp_v.result_)
