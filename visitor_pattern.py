@@ -99,10 +99,7 @@ class Visitor(ABC):
     @abstractmethod
     def visit_variable(self, variable:Variable) -> None:
         pass
-    
-    @abstractmethod
-    def visit_parentheses(self, parentheses:Parentheses) -> None:
-        pass
+
 class ComputeVisitor(Visitor):
 
     def __init__(self, variables=None) -> None:
@@ -139,9 +136,6 @@ class ComputeVisitor(Visitor):
         else:
             print(f"Variable {variable.name} not defined.")
             self.result_ = 0
-
-    def visit_parentheses(self, parentheses):
-        parentheses.expr.accept(self)
 
 class PrettyPrintVisitor(Visitor):
     def __init__(self) -> None:
@@ -189,6 +183,9 @@ class PrintParanthesesVisitor(Visitor):
             result.append(self.result_)
 
         self.result_ = "".join(result)
+
+    def visit_variable(self, variable: Variable) -> None:
+        return super().visit_variable(variable)
 
 
 # Step 3: Implement the parser

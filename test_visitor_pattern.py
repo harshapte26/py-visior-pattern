@@ -44,9 +44,9 @@ def test_parentheses_expression_simple():
     assert res['result'] == 14
 
 def test_parentheses_expression_complex():
-    s = "((30/(3*(4+1)))*4)-10"
+    s = "((30/(3*(4+1)))*4)-2"
     res = main(s)
-    assert res['result'] == 50
+    assert res['result'] == 6
 
 def test_parentheses_prettyprint():
     s = "(((1)+2*((4+5)))/(5))"
