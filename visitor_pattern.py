@@ -44,24 +44,32 @@ class Constant(Expression):
         x = float(s.read().split()[0])
         return Constant(x)
 
-class Op(Expression):
-    def __init__(self, op, l, r):
-        self.op = op
-        self.l = l
-        self.r = r
-        Expression.register_loader("Op", Op.load)
+class Variable(Expression):
+    def __init__(self, name):
+        self.name = name
+        Expression.register_loader("Variable", Variable.load)
 
     def accept(self, visitor):
-        visitor.visit(self)
+        visitor.visit_variable(self)
 
     @staticmethod
     def load(s):
-        op = s.read(1)
-        l = Expression.load(s)
-        r = Expression.load(s)
-        return Op(op, l, r)
+        name = s.read().split()[0]
+        return Variable(name)
 
-# Step 2: Define the Visitor interface
+class Parentheses(Expression):
+    def __init__(self, expr):
+        self.expr = expr
+        Expression.register_loader("Parentheses", Parentheses.load)
+
+    def accept(self, visitor):
+        visitor.visit_parentheses(self)
+
+    @staticmethod
+    def load(s):
+        expr = Expression.load(s)
+        return Parentheses(expr)
+
 class Op(Expression):
     def __init__(self, op, l, r):
         self.op = op
@@ -79,7 +87,6 @@ class Op(Expression):
         r = Expression.load(s)
         return Op(op, l, r)
 
-# Step 2: Define the Visitor interface
 class Visitor(ABC):
     @abstractmethod
     def visit_constant(self, constant:Constant) -> None:
@@ -88,10 +95,18 @@ class Visitor(ABC):
     @abstractmethod
     def visit_op(self, op:Op) -> None:
         pass
+        
+    @abstractmethod
+    def visit_variable(self, variable:Variable) -> None:
+        pass
     
+    @abstractmethod
+    def visit_parentheses(self, parentheses:Parentheses) -> None:
+        pass
 class ComputeVisitor(Visitor):
 
-    def __init__(self) -> None:
+    def __init__(self, variables=None) -> None:
+        self.variables = variables or {}
         self.result_ = 0
 
     def visit_constant(self, constant):
@@ -117,6 +132,16 @@ class ComputeVisitor(Visitor):
 
         else:
             print("Invalid Operand", op.op)
+
+    def visit_variable(self, variable):
+        if variable.name in self.variables:
+            self.result_ = self.variables[variable.name]
+        else:
+            print(f"Variable {variable.name} not defined.")
+            self.result_ = 0
+
+    def visit_parentheses(self, parentheses):
+        parentheses.expr.accept(self)
 
 class PrettyPrintVisitor(Visitor):
     def __init__(self) -> None:
