@@ -94,7 +94,7 @@ class Visitor(ABC):
         pass
 class ComputeVisitor(Visitor):
 
-    def __init__(self) -> None:
+    def __init__(self, variables=None) -> None:
         self.variables = variables or {}
         self.result_ = 0
 
