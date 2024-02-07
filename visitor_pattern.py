@@ -152,6 +152,13 @@ class PrettyPrintVisitor(Visitor):
         result.append(")")
         self.result_ = "".join(result)
 
+    def visit_variable(self, variable):
+        self.result_ = variable.name
+
+    def visit_parentheses(self, parentheses):
+        parentheses.expr.accept(self)
+        self.result_ = "(" + self.result_ + ")"
+
 
 # Step 3: Implement the parser
 def parse(t: str) -> Expression:
