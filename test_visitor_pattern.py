@@ -37,3 +37,18 @@ def test_complex_expression():
 def test_empty_input ():
     res = main("")
     assert res == "Invalid Input"
+
+def test_parentheses_expression_simple():
+    s = "(3+4)*2"
+    res = main(s)
+    assert res['result'] == 14
+
+def test_parentheses_expression_complex():
+    s = "((30/(3*(4+1)))*4)-10"
+    res = main(s)
+    assert res['result'] == 50
+
+def test_parentheses_prettyprint():
+    s = "(((1)+2*((4+5)))/(5))"
+    res = main(s)
+    assert res['pretty_print'] == "(1+2*(4+5))/5"

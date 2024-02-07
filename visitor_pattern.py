@@ -1,6 +1,17 @@
 from abc import ABC, abstractmethod
 import ast
 
+def rank(op):
+    ranks = {
+        '^': 0,
+        '/' : 1,
+        '*' : 1,
+        '+' : 2,
+        '-' : 2
+    }
+
+    return ranks[op]
+
 #Step 1: Define the expression class and it's child classes
 class Expression(ABC):
     def accept(self, visitor):
@@ -127,20 +138,66 @@ class PrettyPrintVisitor(Visitor):
         result.append(")")
         self.result_ = "".join(result)
 
+class PrintParanthesesVisitor(Visitor):
+    def __init__(self) -> None:
+        self.result_ = ""
+
+    def visit_constant(self, constant):
+        self.result_ = str(constant.x)
+
+    def visit_op(self, op):
+        result = []
+        op.l.accept(self)
+
+        if isinstance(op.l, Op) and rank(op.op) < rank(op.l.op):
+            result.append(f"({self.result_})")
+        else:
+            result.append(self.result_)
+
+        result.append(op.op)
+
+        op.r.accept(self)
+
+        if isinstance(op.r, Op) and rank(op.op) < rank(op.r.op):
+            result.append(f"({self.result_})")
+        else:
+            result.append(self.result_)
+
+        self.result_ = "".join(result)
+
 
 # Step 3: Implement the parser
 def parse(t: str) -> Expression:
+
+    c = 0
+
     for i in range(len(t) - 1, -1, -1):
-        if t[i] in ['+', '-']:
+        if t[i] == ')':
+            c += 1
+        elif t[i] == '(':
+            c -= 1
+        elif c == 0 and t[i] in ['+', '-']:
             return Op(t[i], parse(t[:i]), parse(t[i + 1:]))
             
     for i in range(len(t) - 1, -1, -1):
-        if t[i] in ['*', '/']:
+        
+        if t[i] == ')':
+            c += 1
+        elif t[i] == '(':
+            c -= 1
+        elif c == 0 and t[i] in ['*', '/']:
             return Op(t[i], parse(t[:i]), parse(t[i + 1:]))
             
     for i in range(len(t) - 1, -1, -1):
-        if t[i] == '^':
+        if t[i] == ')':
+            c += 1
+        elif t[i] == '(':
+            c -= 1
+        elif c == 0 and t[i]  == '^':
             return Op(t[i], parse(t[:i]), parse(t[i + 1:]))
+        
+    if t[0] == '(' and t[-1] == ')':
+        return parse(t[1:-1])
     
     return Constant(int(t))
 
@@ -173,7 +230,7 @@ def main(s):
     print("Result =",cmp_v.result_)
     result['result'] = cmp_v.result_
 
-    pp_v = PrettyPrintVisitor()
+    pp_v = PrintParanthesesVisitor()
     e.accept(pp_v)
     print("PrettyPrint ->", pp_v.result_)
     result['pretty_print'] = pp_v.result_
@@ -182,5 +239,7 @@ def main(s):
 
 
 if __name__ == "__main__":
-    main()
+    main("3+4*2")
+    main("(3+4)*2")
+    main("(((1)+2*((4+5)))/(5))")
 
