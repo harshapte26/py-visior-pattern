@@ -95,6 +95,7 @@ class Visitor(ABC):
 class ComputeVisitor(Visitor):
 
     def __init__(self) -> None:
+        self.variables = variables or {}
         self.result_ = 0
 
     def visit_constant(self, constant):
@@ -120,6 +121,16 @@ class ComputeVisitor(Visitor):
 
         else:
             print("Invalid Operand", op.op)
+
+    def visit_variable(self, variable):
+        if variable.name in self.variables:
+            self.result_ = self.variables[variable.name]
+        else:
+            print(f"Variable {variable.name} not defined.")
+            self.result_ = 0
+
+    def visit_parentheses(self, parentheses):
+        parentheses.expr.accept(self)
 
 class PrettyPrintVisitor(Visitor):
     def __init__(self) -> None:
