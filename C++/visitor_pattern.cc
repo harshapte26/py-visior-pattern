@@ -3,6 +3,9 @@
 #include <sstream>
 #include <unordered_map>
 #include <cmath>
+#include <functional>
+#include <iomanip>
+#include <typeinfo>
 
 class Visitor;
 
@@ -221,7 +224,9 @@ private:
 class PrettyPrintVisitor : public Visitor {
 public:
     void visit_constant(Constant* constant) override {
-        result_ = "(" + std::to_string(constant->x) + ")";
+        std::string numStr = std::to_string(constant->x);
+        numStr = numStr.substr(0, numStr.find(".") + 3);
+        result_ = "(" + numStr + ")";
     }
     void visit_op(Op* op) override {
         std::string temp;
@@ -242,7 +247,7 @@ public:
 
 // Main function
 int main() {
-    std::string s = "3+4*2";
+    std::string s = "3+5/2";
     std::unordered_map<std::string, double> variables;
     if (!is_valid_expression(s)) {
         std::cout << "Invalid Input" << std::endl;

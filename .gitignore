@@ -1,2 +1,5 @@
+.vscode/
+visitor_pattern.exe
+
 /__pycache__
 /.pytest_cache
