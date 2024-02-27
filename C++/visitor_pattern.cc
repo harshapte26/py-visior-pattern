@@ -14,23 +14,8 @@ class Expression {
 public:
     virtual ~Expression() = default;
     virtual void accept(Visitor& visitor) = 0;
-    static void register_loader(const std::string& key, Expression* (*loader)(std::istream& s)) {
-        loaders[key] = loader;
-    }
-    static Expression* load(std::istream& s) {
-        std::string key;
-        s >> key;
-        auto loader = loaders.find(key);
-        if (loader == loaders.end()) {
-            throw std::invalid_argument("Found unexpected token " + key);
-        }
-        return loader->second(s);
-    }
-private:
-    static std::unordered_map<std::string, Expression* (*)(std::istream&)> loaders;
 };
 
-std::unordered_map<std::string, Expression* (*)(std::istream&)> Expression::loaders;
 
 // Step 2: Define the visitor classes
 class Visitor {
@@ -48,11 +33,7 @@ public:
     void accept(Visitor& visitor) override {
         visitor.visit_constant(this);
     }
-    static Expression* load(std::istream& s) {
-        double x;
-        s >> x;
-        return new Constant(x);
-    }
+
     double x;
 };
 
@@ -62,11 +43,7 @@ public:
     void accept(Visitor& visitor) override {
         visitor.visit_variable(this);
     }
-    static Expression* load(std::istream& s) {
-        std::string name;
-        s >> name;
-        return new Variable(name);
-    }
+
     std::string name;
 };
 
@@ -79,9 +56,7 @@ public:
     void accept(Visitor& visitor) override {
         visitor.visit_parentheses(this);
     }
-    static Expression* load(std::istream& s) {
-        return new Parentheses(Expression::load(s));
-    }
+
     Expression* expr;
 };
 
@@ -95,11 +70,7 @@ public:
     void accept(Visitor& visitor) override {
         visitor.visit_op(this);
     }
-    static Expression* load(std::istream& s) {
-        char op;
-        s >> op;
-        return new Op(op, Expression::load(s), Expression::load(s));
-    }
+
     char op;
     Expression* l;
     Expression* r;
@@ -154,6 +125,7 @@ Expression* parse(std::istringstream& iss) {
 
     return new Constant(std::stod(t));
 }
+
 
 // Step 0: Check if input string is a valid expression
 bool is_valid_expression(const std::string& input_string) {
