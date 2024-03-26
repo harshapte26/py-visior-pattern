@@ -1,0 +1,7 @@
+build greet: link greet.cc :hello.a :bye.a 
+build hello.o: compile hello.cc 
+build hello.a: archive hello.o
+build bye.o: compile bye.cc 
+build bye.a: archive bye.o
+build bye2.o: compile bye2.cc 
+build bye2.a: archive bye2.o
