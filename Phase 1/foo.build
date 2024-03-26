@@ -1,11 +1,24 @@
 cc_binary(
-	name="greet",
-	deps=[":hello"]
-	srcs=["greet.cc"]
+    name="greet",
+    deps=[":hello", ":bye"],
+    srcs=["greet.cc"]
 )
 
 cc_library(
-	name="hello",
-	srcs=["hello.cc"],
-hdrs=["hello.h"],
+    name="hello",
+    srcs=["hello.cc"],
+    hdrs=["hello.h"],
+    deps=":bye2"
+)
+
+cc_library(
+    name="bye",
+    srcs=["bye.cc"],
+    hdrs=["bye.h"]
+)
+
+cc_library(
+    name="bye2",
+    srcs=["bye2.cc"],
+    hdrs=["bye2.h"]
 )
