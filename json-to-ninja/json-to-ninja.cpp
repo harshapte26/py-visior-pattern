@@ -152,7 +152,7 @@ int main() {
     }
 
     // Generate .ninja file
-    NinjaGenerator generator("ninja.build");
+    NinjaGenerator generator("build.ninja");
     for (const auto& target : targets) {
         target->accept(generator);
     }
