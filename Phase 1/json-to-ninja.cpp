@@ -26,7 +26,7 @@ public:
     string type;
     string name;
     vector<string> deps;
-    string srcs;
+    vector<string> srcs;
 
     void accept(BuildVisitor& visitor) override;
 };
@@ -38,7 +38,7 @@ public:
     string name;
     vector<string> srcs;
     vector<string> hdrs;
-    string deps;
+    vector<string> deps;
 
     void accept(BuildVisitor& visitor) override;
 };
@@ -58,6 +58,15 @@ private:
 public:
     NinjaGenerator(const std::string& filename) {
         outFile.open(filename); // Open the output file
+        // Add the static lines at the beginning of the file:
+        outFile << "rule compile\n";
+        outFile << "  command = g++ -c $in -o $out\n";
+        outFile << "\n";
+        outFile << "rule archive\n";
+        outFile << "  command = ar rcs $out $in\n";
+        outFile << "\n";
+        outFile << "rule link\n";
+        outFile << "  command = g++ $in -o $out\n";
     }
 
     ~NinjaGenerator() {
@@ -122,7 +131,6 @@ int main() {
         string type = item["type"];
         if (type == "cc_binary") {
             auto binary = std::make_unique<CCBinary>();
-            binary->type = type;
             binary->name = item["name"];
             binary->srcs = item["srcs"];
             // Handle dependencies
@@ -132,7 +140,6 @@ int main() {
             targets.push_back(std::move(binary));
         } else if (type == "cc_library") {
             auto library = std::make_unique<CCLibrary>();
-            library->type = type;
             library->name = item["name"];
             // Handle srcs
             for (const auto& src : item["srcs"]) {
