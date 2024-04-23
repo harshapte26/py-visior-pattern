@@ -1,0 +1,32 @@
+[
+    {
+        "type": "cc_binary",
+        "name": "greet",
+        "deps": [
+            ":hello",
+            ":bye"
+        ],
+        "srcs": "greet.cc"
+    },
+    {
+        "type": "cc_library",
+        "name": "hello",
+        "srcs": "hello.cc",
+        "hdrs": "hello.h",
+        "deps": [
+            ":bye2"
+        ]
+    },
+    {
+        "type": "cc_library",
+        "name": "bye",
+        "srcs": "bye.cc",
+        "hdrs": "bye.h"
+    },
+    {
+        "type": "cc_library",
+        "name": "bye2",
+        "srcs": "bye2.cc",
+        "hdrs": "bye2.h"
+    }
+]
